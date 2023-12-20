@@ -29,9 +29,5 @@ namespace cwing {
             rect.y = -rect.h; // Reset the asteroid to the top of the screen
         }
     }
-//test leo 
-//test leo 2
 }
 
-//Marcus var här
-//hej igen

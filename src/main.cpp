@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv) 
 {
-    cwing::System sys;
+    //cwing::System sys;
     cwing::GameEngine engine;
 
     // ... setup and run the game ...

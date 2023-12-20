@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            /*"includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "/usr/local/include/SDL2",
+                "/usr/local/include",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/include",
+                "/usr/local/Cellar/sdl2/2.28.5/include",
+                "/usr/local/Cellar/sdl2/2.28.5/include"
+            ],
+
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/include/SDL2",
+                "/usr/local/Cellar/sdl2/2.28.5/include/SDL2",
+                "/usr/local/include"
+            ],*/
+
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "/usr/local/include/SDL2",
+                "/usr/local/include",
+                "${workspaceFolder}/include"
+            ],
+
+            "compilerPath": "/usr/local/bin/g++-13",
+            "intelliSenseMode": "macos-clang-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}

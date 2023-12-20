@@ -51,6 +51,11 @@ namespace cwing
             SDL_Event event;
             while (SDL_PollEvent(&event))
             {
+                if (event.type == SDL_QUIT) // Check for window close event
+                {
+                    running = false; // Set running to false to exit the main loop
+                    break;
+                }
                 switch (currentState)
                 {
                 case GameState::MainMenu:

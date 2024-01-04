@@ -1,4 +1,3 @@
-#include "Constants.h"  // For gResPath and other global constants
 #include "System.h"     // For initializing and managing SDL
 #include "GameEngine.h" // For the game engine
 

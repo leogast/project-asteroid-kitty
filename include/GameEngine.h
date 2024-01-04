@@ -30,6 +30,10 @@ namespace cwing
         bool checkCollisions();
         bool isAsteroid(const Sprite *sprite);
 
+        //nedan följer test
+        void add(Sprite* s);
+        //slut på test
+
     private:
         std::vector<std::unique_ptr<Sprite>> sprites;
         bool running;
@@ -40,7 +44,8 @@ namespace cwing
         {
             MainMenu,
             Playing,
-            GameOver
+            GameOver,
+            Quit
         };
         GameState currentState;
 

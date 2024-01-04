@@ -45,7 +45,6 @@ namespace cwing
             MainMenu,
             Playing,
             GameOver,
-            Quit
         };
         GameState currentState;
 

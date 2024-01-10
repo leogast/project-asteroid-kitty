@@ -1,246 +1,151 @@
 #include "GameEngine.h"
-#include "Button.h"
-#include "Kitty.h"
-#include "Utils.h"
+#include "Constants.h"
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
 #include <SDL2/SDL.h>
+#include <memory> // Include the <memory> header for std::shared_ptr
 
-namespace cwing
+GameEngine::GameEngine(System &system)
+    : system(system), running(true), collisionCount(0), lastAsteroidSpawnTime(0)
 {
-    GameEngine::GameEngine()
-        : currentState(GameState::MainMenu),
-          startButton(100, 100, 200, 50, "Start", [this]()
-                      { currentState = GameState::Playing; }),
-          exitButton(100, 200, 200, 50, "Exit", [this]()
-                     { running = false; })
+    SDL_Init(SDL_INIT_EVERYTHING);
+    backdrop = system.loadTexture(constants::gResPath + "images/backdrop1.png");
+
+    // Initialize kitty sprite in the center of the screen
+    int kittyX = (system.getScreenWidth() - constants::KITTY_WIDTH) / 2;
+    int kittyY = (system.getScreenHeight() - constants::KITTY_HEIGHT) / 2;
+    auto kittyTexture = system.loadTexture(constants::gResPath + "images/kitty1.png");
+    kitty = std::make_shared<Kitty>(kittyTexture, kittyX, kittyY);
+    addSprite(kitty);
+
+    gameStartTime = SDL_GetTicks();
+    srand(static_cast<unsigned int>(time(nullptr)));
+}
+
+GameEngine::~GameEngine()
+{
+    SDL_DestroyTexture(backdrop);
+    SDL_Quit();
+}
+
+void GameEngine::run()
+{
+    while (running)
     {
-        // Initialize other resources...
+        processEvents();
+        update();
+        render();
+        SDL_Delay(16); // Approximately 60 frames per second
     }
+}
 
-    GameEngine::~GameEngine()
+void GameEngine::addSprite(std::shared_ptr<Sprite> sprite)
+{
+    sprites.push_back(sprite);
+}
+
+void GameEngine::removeSprite(Sprite *sprite)
+{
+    sprites.erase(std::remove_if(sprites.begin(), sprites.end(),
+                                 [sprite](const std::shared_ptr<Sprite> &s)
+                                 { return s.get() == sprite; }),
+                  sprites.end());
+}
+
+void GameEngine::processEvents()
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
     {
-        // Clean up resources if needed
-    }
-
-    void GameEngine::addSprite(Sprite *sprite)
-    {
-        sprites.emplace_back(sprite);
-
-        // Assuming kitty is the first sprite added for simplicity
-        if (!kitty)
+        if (event.type == SDL_QUIT)
         {
-            kitty = dynamic_cast<Kitty *>(sprite);
+            running = false;
+        }
+        else
+        {
+            std::static_pointer_cast<Kitty>(kitty)->handleInput(event);
         }
     }
+}
 
-    void GameEngine::updateGameLogic()
+void GameEngine::update()
+{
+    handleAsteroidSpawning();
+    for (auto &sprite : sprites)
     {
-        if (checkCollisions())
-        {
-            dynamic_cast<Kitty *>(kitty)->switchTexture(1); // Switch to kitty2 on collision
-            // Additional logic for handling the collision (e.g., reducing lives)
-        }
+        sprite->update();
+    }
+    checkCollisions();
+}
 
-        // ... other game logic ...
+void GameEngine::render()
+{
+    SDL_Renderer *renderer = system.getRenderer();
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, backdrop, NULL, NULL); // Render the backdrop
+
+    for (auto &sprite : sprites)
+    {
+        sprite->draw(renderer);
     }
 
-    void GameEngine::run()
+    SDL_RenderPresent(renderer);
+}
+
+void GameEngine::checkCollisions()
+{
+    // Collision detection logic
+    for (auto &sprite : sprites)
     {
-        running = true;
-        while (running)
+        if (sprite != kitty && kitty->checkCollision(*sprite))
         {
-            SDL_Event event;
-            while (SDL_PollEvent(&event))
+            collisionCount++;
+            if (collisionCount >= 3)
             {
-                /*
-                //Gamla sättet för att avsluta
-                if (event.type == SDL_QUIT) // Check for window close event
-                {
-                    running = false; // Set running to false to exit the main loop
-                    break;
-                }
-                */
-
-                // fixar klicka på fönstret för att stänga
-                if (event.type == SDL_QUIT)
-                {
-                    running = false;
-                }
-
-                switch (currentState)
-                {
-                case GameState::Quit:
-                    running = false;
-                    break;
-                case GameState::MainMenu:
-                    handleMainMenuEvents(event);
-                    break;
-                case GameState::Playing:
-                    handlePlayingEvents(event);
-                    break;
-                case GameState::GameOver:
-                    handleGameOverEvents(event);
-                    break;
-                }
-            }
-
-            render();
-        }
-    }
-    void GameEngine::handleMainMenuEvents(const SDL_Event &event)
-    {
-        if (event.type == SDL_MOUSEBUTTONDOWN)
-        {
-            int mouseX = event.button.x;
-            int mouseY = event.button.y;
-
-            // Check if the start or exit button is clicked
-            if (startButton.isMouseOver(mouseX, mouseY))
-            {
-                startButton.performClick(); // Change the game state to Playing
-            }
-            else if (exitButton.isMouseOver(mouseX, mouseY))
-            {
-                exitButton.performClick(); // Quit the game
-            }
-        }
-    }
-
-    void GameEngine::handlePlayingEvents(const SDL_Event &event)
-    {
-        // Handle events when in the Playing state
-        if (event.type == SDL_KEYDOWN)
-        {
-            handleKeyboardEvent(event.key);
-        }
-        else if (event.type == SDL_MOUSEBUTTONDOWN)
-        {
-            if (kitty && isMouseOnSprite(event.button.x, event.button.y, kitty->getRect()))
-            {
-                draggingKitty = true;
-            }
-        }
-        else if (event.type == SDL_MOUSEBUTTONUP)
-        {
-            draggingKitty = false;
-        }
-        else if (event.type == SDL_MOUSEMOTION)
-        {
-            if (draggingKitty && kitty)
-            {
-                Kitty *kittyPtr = dynamic_cast<Kitty *>(kitty);
-                if (kittyPtr)
-                {
-                    kittyPtr->setPosition(event.motion.x, event.motion.y);
-                }
-            }
-        }
-        updateSprites();
-    }
-
-    void GameEngine::handleGameOverEvents(const SDL_Event &event)
-    {
-        // Handle GameOver state events (e.g., restart or return to main menu)
-        // if (event.type == SDL_MOUSEBUTTONDOWN) {
-        //     // Handle button clicks for restarting or exiting
-        // }
-    }
-
-    void GameEngine::render()
-    {
-        SDL_RenderClear(sys.getRenderer()); // Clear the screen
-
-        switch (currentState)
-        {
-        case GameState::MainMenu:
-            renderMainMenu();
-            break;
-        case GameState::Playing:
-            renderPlaying();
-            break;
-        case GameState::GameOver:
-            renderGameOver();
-            break;
-        case GameState::Quit:
-            break;
-        }
-
-        SDL_RenderPresent(sys.getRenderer()); // Update the screen
-    }
-
-    void GameEngine::renderMainMenu()
-    {
-        startButton.draw(sys.getRenderer());
-        exitButton.draw(sys.getRenderer());
-    }
-
-    void GameEngine::renderPlaying()
-    {
-        for (const auto &sprite : sprites)
-        {
-            sprite->draw(sys.getRenderer());
-        }
-        // Add other gameplay rendering here (e.g., score, lives)
-    }
-
-    void GameEngine::renderGameOver()
-    {
-        // Render GameOver screen items (e.g., messages, buttons)
-    }
-
-    void GameEngine::handleKeyboardEvent(const SDL_KeyboardEvent &keyEvent)
-    {
-        Kitty *kittyPtr = dynamic_cast<Kitty *>(kitty);
-        if (kittyPtr)
-        {
-            switch (keyEvent.keysym.sym)
-            {
-            case SDLK_UP:
-                kittyPtr->move(0, -5);
-                break; // Move kitty up
-            case SDLK_DOWN:
-                kittyPtr->move(0, 5);
-                break; // Move kitty down
-            case SDLK_LEFT:
-                kittyPtr->move(-5, 0);
-                break; // Move kitty left
-            case SDLK_RIGHT:
-                kittyPtr->move(5, 0);
-                break; // Move kitty right
+                gameOver();
+                break;
             }
         }
     }
+}
 
-    bool GameEngine::isMouseOnSprite(int mouseX, int mouseY, const SDL_Rect &rect)
+void GameEngine::handleAsteroidSpawning()
+{
+    Uint32 currentTime = SDL_GetTicks();
+    Uint32 elapsed = currentTime - gameStartTime;
+    Uint32 spawnInterval;
+
+    if (elapsed < 5000)
     {
-        return mouseX >= rect.x && mouseX <= rect.x + rect.w &&
-               mouseY >= rect.y && mouseY <= rect.y + rect.h;
+        spawnInterval = constants::INITIAL_ASTEROID_SPAWN_INTERVAL;
+    }
+    else if (elapsed < 10000)
+    {
+        spawnInterval = constants::INCREASED_SPAWN_INTERVAL_5SEC;
+    }
+    else
+    {
+        spawnInterval = constants::INCREASED_SPAWN_INTERVAL_10SEC;
     }
 
-    void GameEngine::updateSprites()
+    if (currentTime - lastAsteroidSpawnTime > spawnInterval)
     {
-        for (auto &sprite : sprites)
-        {
-            sprite->update();
-        }
+        spawnAsteroid();
+        lastAsteroidSpawnTime = currentTime;
     }
+}
 
-    bool GameEngine::checkCollisions()
-    {
-        for (const auto &sprite : sprites)
-        {
-            if (isAsteroid(sprite.get()) && Utils::checkCollision(sprite->getRect(), kitty->getRect()))
-            {
-                return true; // Collision detected
-            }
-        }
-        return false; // No collision
-    }
+void GameEngine::spawnAsteroid()
+{
+    int asteroidX = rand() % system.getScreenWidth();
+    auto asteroidTexture = system.loadTexture(constants::gResPath + "images/asteroid1.png");
+    auto asteroid = std::make_shared<Asteroid>(asteroidTexture, asteroidX, 0);
+    addSprite(asteroid);
+}
 
-    // Helper function to determine if a sprite is an asteroid
-    bool GameEngine::isAsteroid(const Sprite *sprite)
-    {
-        // Implement logic to determine if the sprite is an asteroid
-        return false;
-    }
-
+void GameEngine::gameOver()
+{
+    running = false;
+    // Additional game over logic (display message, reset game, etc.)
 }

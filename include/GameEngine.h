@@ -1,63 +1,49 @@
-#ifndef GAME_ENGINE_H
-#define GAME_ENGINE_H
+#ifndef GAMEENGINE_H
+#define GAMEENGINE_H
 
-#include "System.h"
-#include "Sprite.h"
-#include "Button.h"
 #include <vector>
 #include <memory>
 #include <SDL2/SDL.h>
+#include "Sprite.h"
+#include "System.h"
 
-namespace cwing
+class GameEngine
 {
-
-    class GameEngine
+public:
+    explicit GameEngine(System &system);
+    ~GameEngine();
+    void run();
+    void addSprite(std::shared_ptr<Sprite> sprite);
+    void removeSprite(Sprite *sprite);
+    void initializeLevel(int level)
     {
-    public:
-        GameEngine();
-        ~GameEngine();
+        // Function definition for initializeLevel
+        // Add your code here
+    }
+    void cleanup()
+    {
+        // Function definition for cleanup
+        // Add your code here
+    }
 
-        void addSprite(Sprite *sprite);
-        void run();
-        void handleMainMenuEvents(const SDL_Event &event);
-        void handlePlayingEvents(const SDL_Event &event);
-        void handleGameOverEvents(const SDL_Event &event);
-        void render();
-        void renderMainMenu();
-        void renderPlaying();
-        void renderGameOver();
-        void updateGameLogic();
-        bool checkCollisions();
-        bool isAsteroid(const Sprite *sprite);
+private:
+    System &system;
+    bool running;
+    std::vector<std::shared_ptr<Sprite>> sprites;
+    std::shared_ptr<Sprite> kitty; // Kitty sprite
+    int collisionCount;
+    Uint32 lastAsteroidSpawnTime;
+    Uint32 gameStartTime;
+    SDL_Renderer *renderer;
+    SDL_Texture *backdrop;
 
-        //nedan följer test
-        void add(Sprite* s);
-        //slut på test
+    void processEvents();
+    void update();
+    void render();
+    void checkCollisions();
+    void handleAsteroidSpawning();
+    void spawnAsteroid();
+    void gameOver();
+};
 
-    private:
-        std::vector<std::unique_ptr<Sprite>> sprites;
-        bool running;
-        bool draggingKitty;
-        Sprite *kitty;
-
-        enum class GameState
-        {
-            MainMenu,
-            Playing,
-            GameOver,
-            Quit
-        };
-        GameState currentState;
-
-        Button startButton;
-        Button exitButton;
-
-        void handleKeyboardEvent(const SDL_KeyboardEvent &keyEvent);
-        bool isMouseOnSprite(int mouseX, int mouseY, const SDL_Rect &rect);
-        void updateSprites();
-        void renderSprites();
-    };
-
-}
-
-#endif // GAME_ENGINE_H
+#endif

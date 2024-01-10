@@ -3,33 +3,32 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_ttf.h>
+#include <string>
 
-namespace cwing
+class System
 {
+public:
+    System(int screenWidth, int screenHeight);
+    ~System();
+    
+    System(const System &) = delete;
+    System &operator=(const System &) = delete;
+    System(System &&) = delete;
+    System &operator=(System &&) = delete;
 
-    class System
-    {
-    public:
-        System();
-        ~System();
+    SDL_Renderer *getRenderer() const;
+    SDL_Texture *loadTexture(const std::string &path);
+    int getScreenWidth() const;
+    int getScreenHeight() const;
 
-        SDL_Renderer *getRenderer() const;
-        TTF_Font *get_font() const;
+private:
+    SDL_Window *window = nullptr;
+    SDL_Renderer *renderer = nullptr;
+    int screenWidth = 0;
+    int screenHeight = 0;
 
-        // Prevent copy construction and assignment
-        System(const System &) = delete;
-        System &operator=(const System &) = delete;
-
-    private:
-        SDL_Window *window;
-        SDL_Renderer *renderer;
-        TTF_Font *font;
-    };
-
-    // Global system object
-    extern System sys;
-}
+    void initSDL();
+    void createWindowAndRenderer(int width, int height);
+};
 
 #endif

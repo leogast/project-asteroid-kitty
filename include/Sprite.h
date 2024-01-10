@@ -3,34 +3,33 @@
 
 #include <SDL2/SDL.h>
 
-namespace cwing
+class Sprite
 {
+public:
+    Sprite(SDL_Texture *texture, int x, int y, int width, int height);
+    virtual ~Sprite();
+    virtual void draw(SDL_Renderer *renderer) const;
+    virtual void update();
+    virtual bool checkCollision(const Sprite &other) const;
 
-    enum class SpriteType
-    {
-        Kitty,
-        Asteroid
-        // ... other types if needed ...
-    };
+protected:
+    SDL_Rect rect;
+    SDL_Texture *texture;
+};
 
-    class Sprite
-    {
-    public:
-        Sprite(int x, int y, int w, int h, SpriteType type);
-        virtual ~Sprite() = default;
+class Kitty : public Sprite
+{
+public:
+    Kitty(SDL_Texture *texture, int x, int y);
+    void update() override;
+    void handleInput(const SDL_Event &event); // Handle input for moving the kitty
+};
 
-        virtual void draw(SDL_Renderer *renderer) const = 0;
-        virtual void update() = 0;
-
-        SpriteType getType() const { return type; }
-
-        SDL_Rect getRect() const;
-
-    protected:
-        SDL_Rect rect;
-        SpriteType type;
-    };
-
-}
+class Asteroid : public Sprite
+{
+public:
+    Asteroid(SDL_Texture *texture, int x, int y);
+    void update() override;
+};
 
 #endif

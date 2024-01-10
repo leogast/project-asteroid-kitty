@@ -1,15 +1,22 @@
-#include "System.h"     // For initializing and managing SDL
-#include "GameEngine.h" // For the game engine
+#include "GameEngine.h"
+#include "System.h"
+#include "Session.h"
+#include <iostream>
 
-using namespace cwing;
-
-int main(int argc, char** argv) 
+int main(int argc, char *argv[])
 {
-    //cwing::System sys;
-    GameEngine engine;
+    try
+    {
+        System sys(800, 600); // Initialize the system (SDL, window, renderer)
+        Session session(sys);
+        session.startNewGame(); // Start a new game
+        session.run();          // Enter the game loop
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error occurred: " << e.what() << std::endl;
+        return 1; // Return a non-zero value to indicate error
+    }
 
-    // ... setup and run the game ...
-    engine.run();
-
-    return 0;
+    return 0; // Successful execution
 }

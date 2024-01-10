@@ -61,7 +61,8 @@ namespace cwing
                 */
                 switch (currentState)
                 {
-                case GameState::Quit: running = false; 
+                case GameState::Quit:
+                    running = false;
                     break;
                 case GameState::MainMenu:
                     handleMainMenuEvents(event);
@@ -151,6 +152,8 @@ namespace cwing
             break;
         case GameState::GameOver:
             renderGameOver();
+            break;
+        case GameState::Quit:
             break;
         }
 

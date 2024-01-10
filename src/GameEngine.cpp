@@ -59,6 +59,13 @@ namespace cwing
                     break;
                 }
                 */
+
+                // fixar klicka på fönstret för att stänga
+                if (event.type == SDL_QUIT)
+                {
+                    running = false;
+                }
+
                 switch (currentState)
                 {
                 case GameState::Quit:

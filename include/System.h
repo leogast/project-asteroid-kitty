@@ -10,7 +10,7 @@ class System
 public:
     System(int screenWidth, int screenHeight);
     ~System();
-    
+
     System(const System &) = delete;
     System &operator=(const System &) = delete;
     System(System &&) = delete;

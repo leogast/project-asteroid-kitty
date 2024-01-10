@@ -15,16 +15,8 @@ public:
     void run();
     void addSprite(std::shared_ptr<Sprite> sprite);
     void removeSprite(Sprite *sprite);
-    void initializeLevel(int level)
-    {
-        // Function definition for initializeLevel
-        // Add your code here
-    }
-    void cleanup()
-    {
-        // Function definition for cleanup
-        // Add your code here
-    }
+    void initializeLevel(int level) {}
+    void cleanup() {}
 
 private:
     System &system;

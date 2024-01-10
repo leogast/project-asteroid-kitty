@@ -147,5 +147,4 @@ void GameEngine::spawnAsteroid()
 void GameEngine::gameOver()
 {
     running = false;
-    // Additional game over logic (display message, reset game, etc.)
 }

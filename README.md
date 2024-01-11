@@ -1,5 +1,3 @@
-# Dokumentation för Projekt: Asteroid Kitty
-
 ## Välkommen till ☄️ Asteroid Kitty!
 
 Asteroid Kitty är ett spännande och utmanande arkadspel där spelaren styr en katt genom en asteroidregnskur i en öken. Målet är att undvika kollisioner med asteroiderna för att överleva så länge som möjligt.

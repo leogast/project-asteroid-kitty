@@ -28,7 +28,7 @@ Asteroid Kitty är ett spännande och utmanande arkadspel där spelaren styr en 
 ## Systemkrav och Beskrivning:
 Programmet är skrivet i C++ och använder SDL2-biblioteket för grafik. Det är objektorienterat och indelat i klasser som använder tekniker som inkapsling, arv och polymorfism. Systemspecifikationerna för att köra spelet är inställda för en Mac enligt följande c_cpp_properties.json-information:
                   {
-                       "konfigurationer": [
+                            "konfigurationer": [
                            {
                                "name": "Mac",
                                "includePath": [

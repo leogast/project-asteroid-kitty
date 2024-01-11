@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include "Sprite.h"
 #include "System.h"
 
@@ -32,6 +33,8 @@ private:
 
     int frameRate;     // New member to store the frame rate
     Uint32 frameDelay; // New member to store the delay per frame
+
+    Mix_Music *backgroundMusic; // For background music
 
     void processEvents();
     void update();

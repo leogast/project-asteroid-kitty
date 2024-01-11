@@ -5,6 +5,7 @@
 #include <ctime>
 #include <SDL2/SDL.h>
 #include <memory> // Include the <memory> header for std::shared_ptr
+#include <iostream>
 
 GameEngine::GameEngine(System &system)
     : system(system), running(true), collisionCount(0), lastAsteroidSpawnTime(0), frameRate(60) // Initialize frameRate to 60 FPS
@@ -23,10 +24,27 @@ GameEngine::GameEngine(System &system)
     gameStartTime = SDL_GetTicks();
     srand(static_cast<unsigned int>(time(nullptr)));
     calculateFrameDelay(); // Calculate initial frame delay
+
+    backgroundMusic = Mix_LoadMUS("sounds/music1.wav");
+    if (!backgroundMusic)
+    {
+        std::cerr << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << std::endl;
+    }
+    else
+    {
+        if (Mix_PlayMusic(backgroundMusic, -1) == -1)
+        { // -1 for looping
+            std::cerr << "Failed to play music! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        }
+    }
 }
 
 GameEngine::~GameEngine()
 {
+    if (backgroundMusic)
+    {
+        Mix_FreeMusic(backgroundMusic);
+    }
     SDL_DestroyTexture(backdrop);
     SDL_Quit();
 }

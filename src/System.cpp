@@ -6,6 +6,11 @@ System::System(int screenWidth, int screenHeight)
 {
     initSDL();
     createWindowAndRenderer(screenWidth, screenHeight);
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        std::cerr << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        throw std::runtime_error("SDL_mixer Initialization Failed");
+    }
 }
 
 System::~System()
@@ -21,6 +26,8 @@ System::~System()
         window = nullptr;
     }
     IMG_Quit();
+    Mix_CloseAudio();
+    Mix_Quit();
     SDL_Quit();
 }
 

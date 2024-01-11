@@ -55,7 +55,22 @@ void Kitty::handleInput(const SDL_Event &event)
             break;
         }
     }
-    // Add more controls if necessary, e.g., for mouse input
+    else if (event.type == SDL_MOUSEMOTION)
+    {
+        // Move the kitty to the mouse position
+        rect.x = event.motion.x - (constants::KITTY_WIDTH / 2); // Center the kitty on the cursor
+        rect.y = event.motion.y - (constants::KITTY_HEIGHT / 2);
+    }
+
+    // Ensure the kitty stays within the screen bounds
+    if (rect.x < 0)
+        rect.x = 0;
+    if (rect.x > constants::SCREEN_WIDTH - constants::KITTY_WIDTH)
+        rect.x = constants::SCREEN_WIDTH - constants::KITTY_WIDTH;
+    if (rect.y < 0)
+        rect.y = 0;
+    if (rect.y > constants::SCREEN_HEIGHT - constants::KITTY_HEIGHT)
+        rect.y = constants::SCREEN_HEIGHT - constants::KITTY_HEIGHT;
 }
 
 Asteroid::Asteroid(SDL_Texture *texture, int x, int y)

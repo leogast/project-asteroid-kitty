@@ -7,8 +7,9 @@
 #include <memory> // Include the <memory> header for std::shared_ptr
 
 GameEngine::GameEngine(System &system)
-    : system(system), running(true), collisionCount(0), lastAsteroidSpawnTime(0)
+    : system(system), running(true), collisionCount(0), lastAsteroidSpawnTime(0), frameRate(60) // Initialize frameRate to 60 FPS
 {
+
     SDL_Init(SDL_INIT_EVERYTHING);
     backdrop = system.loadTexture(constants::gResPath + "images/backdrop1.png");
 
@@ -21,6 +22,7 @@ GameEngine::GameEngine(System &system)
 
     gameStartTime = SDL_GetTicks();
     srand(static_cast<unsigned int>(time(nullptr)));
+    calculateFrameDelay(); // Calculate initial frame delay
 }
 
 GameEngine::~GameEngine()
@@ -31,12 +33,20 @@ GameEngine::~GameEngine()
 
 void GameEngine::run()
 {
+    Uint32 frameStart, frameTime;
+
     while (running)
     {
+        frameStart = SDL_GetTicks();
+
         processEvents();
         update();
         render();
-        SDL_Delay(16); // Approximately 60 frames per second
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime)
+        {
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 }
 
@@ -147,4 +157,15 @@ void GameEngine::spawnAsteroid()
 void GameEngine::gameOver()
 {
     running = false;
+}
+
+void GameEngine::setFrameRate(int fps)
+{
+    frameRate = fps;
+    calculateFrameDelay();
+}
+
+void GameEngine::calculateFrameDelay()
+{
+    frameDelay = 1000 / frameRate; // 1000 ms in a second
 }

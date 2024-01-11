@@ -17,6 +17,7 @@ public:
     void removeSprite(Sprite *sprite);
     void initializeLevel(int level) {}
     void cleanup() {}
+    void setFrameRate(int fps); // New method to set frame rate
 
 private:
     System &system;
@@ -29,6 +30,9 @@ private:
     SDL_Renderer *renderer;
     SDL_Texture *backdrop;
 
+    int frameRate;     // New member to store the frame rate
+    Uint32 frameDelay; // New member to store the delay per frame
+
     void processEvents();
     void update();
     void render();
@@ -36,6 +40,7 @@ private:
     void handleAsteroidSpawning();
     void spawnAsteroid();
     void gameOver();
+    void calculateFrameDelay(); // New method to calculate frame delay
 };
 
 #endif
